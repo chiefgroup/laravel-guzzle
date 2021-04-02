@@ -10,8 +10,6 @@
 
 namespace Chiefgroup\Http\Facades;
 
-use App\Services\Guzzle;
-use Chiefgroup\Http\Client\Http;
 use Illuminate\Support\Facades\Facade;
 
 /**

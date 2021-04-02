@@ -16,7 +16,6 @@ use Monolog\Handler\StreamHandler;
 use Chiefgroup\Http\Support\Log;
 use Chiefgroup\Http\Support\Collection;
 use Chiefgroup\Http\Client\Http;
-use Chiefgroup\Http\Client\AbstractAPI;
 use Illuminate\Support\Facades\Config;
 
 class Guzzle extends Http
