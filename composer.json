@@ -1,0 +1,54 @@
+{
+  "name": "2512422541/laravel-guzzle",
+  "description": "Chiefgroup Laravel Interface API Use",
+  "keywords": [
+    "laravel",
+    "guzzle",
+    "passport"
+  ],
+  "homepage": "https://github.com/2512422541/laravel-guzzle",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "peng",
+      "email": "2512422541@qq.com"
+    }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": "^6.5",
+    "monolog/monolog": "^2.0",
+    "illuminate/support": "^6.0 || ^7.0 || ^8.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Chiefgroup\\Http\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Chiefgroup\\Http\\Tests\\": "tests"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Chiefgroup\\Http\\Providers\\ServiceProvider"
+      ],
+      "aliases": {
+        "LaravelGuzzleHttp": "Chiefgroup\\Http\\Facades\\LaravelGuzzleHttp"
+      }
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
