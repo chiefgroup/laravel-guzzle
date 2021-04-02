@@ -1,12 +1,12 @@
 {
-  "name": "2512422541/laravel-guzzle",
+  "name": "chiefgroup/laravel-guzzle",
   "description": "Chiefgroup Laravel Interface API Use",
   "keywords": [
     "laravel",
     "guzzle",
     "passport"
   ],
-  "homepage": "https://github.com/2512422541/laravel-guzzle",
+  "homepage": "https://github.com/chiefgroup/laravel-guzzle",
   "type": "library",
   "license": "MIT",
   "authors": [
