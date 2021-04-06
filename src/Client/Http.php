@@ -256,7 +256,6 @@ class Http
             RequestInterface $request,
             ResponseInterface $response = null
         ) {
-            var_dump($retries);
             // defult Limit the number of retries to 2
             if ($retries <= $this->maxRetries && $response && $body = $response->getBody()) {
                 // Retry on server errors
@@ -292,7 +291,6 @@ class Http
     public function request($url, $method = 'GET', $options = [])
     {
         if (0 === count($this->getMiddlewares())) {
-            var_dump(1111);
             $this->registerHttpMiddlewares();
         }
 
