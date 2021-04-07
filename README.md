@@ -17,14 +17,15 @@ $ php artisan vendor:publish --provider="Chiefgroup\Http\Providers\ServiceProvid
 
 ```php
     
-    Method : get\put\post\patch\delete
+    // Method : get\put\post\patch\delete
 
-    $response = LaravelGuzzleHttp::get('api/users');
+    $result = LaravelGuzzleHttp::get('api/users');
 
-    $result = json_decode((string) $response->getBody(), true);
-
-    $data = $headers= [];
+    $data = $headers = [];
     LaravelGuzzleHttp::post('http://xxx.com', $data, $headers);
+
+    dd($result);
+
 ```
 
 ## License

@@ -313,7 +313,7 @@ class Http
             'Body'    => strval($response->getBody()),
         ]);
 
-        return $response;
+        return $this->parseJSON($response);
     }
 
     /**

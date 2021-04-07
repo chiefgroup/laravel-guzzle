@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static post(string$uri, array $options = [], array $headers = [])
  * @method static patch(string $uri, array $options = [], array $headers = [])
  * @method static delete(string $uri, array $options = [], array $headers = [])
+ * @method static json(string $url, array $options = [], array $headers = [], array $queries = [])
  *
  */
 class LaravelGuzzleHttp extends Facade

@@ -62,10 +62,10 @@ class AccessToken
 
         $http = $this->getHttp();
 
-        $result = $http->parseJSON($http->post('oauth/token', $params));
+        $result = $http->post('oauth/token', $params);
 
-        if (empty($result['data'])) {
-            throw new HttpException('Refresh AccessToken fail. response: '.json_encode($result, JSON_UNESCAPED_UNICODE));
+        if (empty($result)) {
+            throw new HttpException('Refresh AccessToken fail. response null');
         }
 
         return $result;
