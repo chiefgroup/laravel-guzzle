@@ -336,9 +336,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param  array  $array
      * @return array
      */
-    public function __set_state(array $array)
+    public static function __set_state(array $array)
     {
-        return $this->all();
+        return (new self($array))->all();
     }
 
     /**
