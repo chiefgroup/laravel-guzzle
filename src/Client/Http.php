@@ -19,7 +19,7 @@ use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class Http
+class Http extends AccessToken
 {
     /**
      * Used to identify handler defined by client code
@@ -74,6 +74,8 @@ class Http
         $this->base_uri = $confing->get('servers.default.base_uri');
 
         $this->maxRetries = $confing->get('servers.default.max_retries');
+
+        parent::__construct($this->config);
     }
 
     /**
@@ -229,19 +231,8 @@ class Http
         $this->addMiddleware($this->logMiddleware());
         // retry
         $this->addMiddleware($this->retryMiddleware());
-    }
-
-    /**
-     * Log the request.
-     *
-     * @return \Closure
-     */
-    protected function logMiddleware()
-    {
-        return Middleware::tap(function (RequestInterface $request, $options) {
-            Log::debug("Request: {$request->getMethod()} {$request->getUri()} ".json_encode($options));
-            Log::debug('Request headers:'.json_encode($request->getHeaders()));
-        });
+        // Authorization
+        $this->addMiddleware($this->authorizationMiddleware());
     }
 
     /**
@@ -264,7 +255,9 @@ class Http
                     $headers = $request->getHeaders();
 
                     if (!empty($headers['Authorization']) && !empty($headers['refresh_token'])) {
-                        (new AccessToken($this->config))->refreshToken($headers['refresh_token'][0]);
+                        $request = $request->withHeader('Authorization', $this->refreshToken($headers['refresh_token']));
+                    } else {
+                        $request = $request->withHeader('Authorization', $this->getToken(false));
                     }
 
                     $request = $request->withHeader('Content-Type', 'application/json');
@@ -277,6 +270,20 @@ class Http
 
             return false;
         });
+    }
+
+    /**
+     * authorization middleware.
+     * @return \Closure
+     */
+    protected function authorizationMiddleware()
+    {
+        return function (callable $handler) {
+            return function (RequestInterface $request, array $options) use ($handler) {
+                $request = $request->withHeader('Authorization', $this->getToken())->withHeader('Accept', 'application/json');
+                return $handler($request, $options);
+            };
+        };
     }
 
     /**

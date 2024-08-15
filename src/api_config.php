@@ -25,14 +25,14 @@ return [
             'base_uri'      => '',
             // Scope
             'scope'         => '*',
-            // Refresh Token
-            'grant_type'    => 'refresh_token',
             // Client Id
             'client_id'     => 1,
             // Client Secret
             'client_secret' => 'xxxxxx',
             // Retries count
             'max_retries'   => 2,
+            // Member account
+            'username'      => '13111111111',
         ]
     ],
 
