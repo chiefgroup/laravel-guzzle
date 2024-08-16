@@ -105,7 +105,7 @@ class Http extends AccessToken
      */
     public function post($url, $options = [], $headers = [])
     {
-        $key = is_array($options) ? 'form_params' : 'body';
+        $key = is_array($options) ? 'json' : 'body';
 
         return $this->request($url, 'POST', [$key => $options, 'headers' => $headers]);
     }
@@ -118,7 +118,7 @@ class Http extends AccessToken
      */
     public function put($url, $options = [], $headers = [])
     {
-        $key = is_array($options) ? 'form_params' : 'body';
+        $key = is_array($options) ? 'json' : 'body';
 
         return $this->request($url, 'PUT', [$key => $options, 'headers' => $headers]);
     }
