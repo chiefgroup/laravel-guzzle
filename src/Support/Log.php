@@ -10,18 +10,24 @@
 
 namespace Chiefgroup\Http\Support;
 
-use Monolog\Handler\ErrorLogHandler;
-use Monolog\Handler\NullHandler;
-use Monolog\Logger;
+use Illuminate\Support\Facades\Log as LaravelLog;
 use Psr\Log\LoggerInterface;
 
 class Log
 {
     protected static $logger;
+    protected static $channel = null;
 
     public static function getLogger()
     {
-        return self::$logger ?: self::$logger = self::createDefaultLogger();
+        if (!self::$logger) {
+            if (self::$channel) {
+                self::$logger = LaravelLog::channel(self::$channel);
+            } else {
+                self::$logger = LaravelLog::channel('default');
+            }
+        }
+        return self::$logger;
     }
 
     /**
@@ -30,6 +36,24 @@ class Log
     public static function setLogger(LoggerInterface $logger)
     {
         self::$logger = $logger;
+    }
+
+    /**
+     * Set log channel.
+     */
+    public static function setChannel($channel)
+    {
+        self::$channel = $channel;
+        // Reset logger to use new channel
+        self::$logger = null;
+    }
+
+    /**
+     * Get current log channel.
+     */
+    public static function getChannel()
+    {
+        return self::$channel;
     }
 
     /**
@@ -66,23 +90,5 @@ class Log
     public function __call($method, $args)
     {
         return call_user_func_array([self::getLogger(), $method], $args);
-    }
-
-    /**
-     * Make a default log instance.
-     *
-     * @return \Monolog\Logger
-     */
-    private static function createDefaultLogger()
-    {
-        $log = new Logger('laravel-guzzle-http');
-
-        if (defined('PHPUNIT_RUNNING') || 'cli' === php_sapi_name()) {
-            $log->pushHandler(new NullHandler());
-        } else {
-            $log->pushHandler(new ErrorLogHandler());
-        }
-
-        return $log;
     }
 }

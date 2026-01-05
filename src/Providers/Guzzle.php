@@ -10,9 +10,6 @@
 
 namespace Chiefgroup\Http\Providers;
 
-use Monolog\Logger;
-use Monolog\Handler\NullHandler;
-use Monolog\Handler\StreamHandler;
 use Chiefgroup\Http\Support\Log;
 use Chiefgroup\Http\Support\Collection;
 use Chiefgroup\Http\Client\Http;
@@ -42,16 +39,10 @@ class Guzzle extends Http
             return;
         }
 
-        $logger = new Logger('laravel-guzzle-http');
-
-        if (!$this->config->get('debug') || defined('PHPUNIT_RUNNING')) {
-            $logger->pushHandler(new NullHandler());
-        } elseif ($logFile = $this->config->get('log.file')) {
-            try {
-                $logger->pushHandler(new StreamHandler($logFile, $this->config->get('log.level', Logger::DEBUG), true, null));
-            } catch (\Exception $e) {
-            }
+        // 设置自定义日志 channel
+        $logChannel = $this->config->get('log.channel');
+        if ($logChannel) {
+            Log::setChannel($logChannel);
         }
-        Log::setLogger($logger);
     }
 }

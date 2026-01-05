@@ -18,6 +18,7 @@ use Chiefgroup\Http\Support\Log;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 class Http extends AccessToken
 {
@@ -227,6 +228,8 @@ class Http extends AccessToken
      */
     protected function registerHttpMiddlewares()
     {
+        // exception handler
+        $this->addMiddleware($this->exceptionHandlerMiddleware());
         // log
         $this->addMiddleware($this->logMiddleware());
         // retry
@@ -260,7 +263,7 @@ class Http extends AccessToken
                         $request = $request->withHeader('Authorization', $this->getToken(false));
                     }
 
-                    $request = $request->withHeader('Content-Type', 'application/json');
+                    $request->withHeader('Content-Type', 'application/json');
 
                     Log::debug("Retry with Request Token: {".json_encode($headers)."}");
 
@@ -284,6 +287,130 @@ class Http extends AccessToken
                 return $handler($request, $options);
             };
         };
+    }
+
+    /**
+     * Exception handler middleware.
+     * @return \Closure
+     */
+    protected function exceptionHandlerMiddleware()
+    {
+        return function (callable $handler) {
+            return function (RequestInterface $request, array $options) use ($handler) {
+                try {
+                    $response = $handler($request, $options);
+                    return $response;
+                } catch (\GuzzleHttp\Exception\RequestException $e) {
+                    // 记录请求异常到日志
+                    Log::error('Guzzle HTTP Request Exception:', [
+                        'exception' => $e->getMessage(),
+                        'request' => [
+                            'method' => $request->getMethod(),
+                            'uri' => (string) $request->getUri(),
+                            'headers' => $request->getHeaders(),
+                            'body' => $this->getRequestBody($request),
+                        ],
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ]);
+                    
+                    // 抛出封装的异常
+                    throw new HttpException(null, $e->getCode(), $e->getMessage(), $e);
+                } catch (\GuzzleHttp\Exception\ClientException $e) {
+                    // 记录客户端异常
+                    $response = $e->getResponse();
+                    Log::error('Guzzle HTTP Client Exception:', [
+                        'exception' => $e->getMessage(),
+                        'request' => [
+                            'method' => $request->getMethod(),
+                            'uri' => (string) $request->getUri(),
+                            'headers' => $request->getHeaders(),
+                            'body' => $this->getRequestBody($request),
+                        ],
+                        'response' => [
+                            'status_code' => $response->getStatusCode(),
+                            'headers' => $response->getHeaders(),
+                            'body' => (string) $response->getBody(),
+                        ],
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ]);
+                    
+                    throw new HttpException($response, $e->getCode(), $e->getMessage(), $e);
+                } catch (\GuzzleHttp\Exception\ServerException $e) {
+                    // 记录服务器异常
+                    $response = $e->getResponse();
+                    Log::error('Guzzle HTTP Server Exception:', [
+                        'exception' => $e->getMessage(),
+                        'request' => [
+                            'method' => $request->getMethod(),
+                            'uri' => (string) $request->getUri(),
+                            'headers' => $request->getHeaders(),
+                            'body' => $this->getRequestBody($request),
+                        ],
+                        'response' => [
+                            'status_code' => $response->getStatusCode(),
+                            'headers' => $response->getHeaders(),
+                            'body' => (string) $response->getBody(),
+                        ],
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ]);
+                    
+                    throw new HttpException($response, $e->getCode(), $e->getMessage(), $e);
+                } catch (\GuzzleHttp\Exception\ConnectException $e) {
+                    // 记录连接异常
+                    Log::error('Guzzle HTTP Connection Exception:', [
+                        'exception' => $e->getMessage(),
+                        'request' => [
+                            'method' => $request->getMethod(),
+                            'uri' => (string) $request->getUri(),
+                            'headers' => $request->getHeaders(),
+                            'body' => $this->getRequestBody($request),
+                        ],
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ]);
+                    
+                    throw new HttpException(null, $e->getCode(), $e->getMessage(), $e);
+                } catch (\Exception $e) {
+                    // 记录其他异常
+                    Log::error('Guzzle HTTP General Exception:', [
+                        'exception' => $e->getMessage(),
+                        'request' => [
+                            'method' => $request->getMethod(),
+                            'uri' => (string) $request->getUri(),
+                            'headers' => $request->getHeaders(),
+                            'body' => $this->getRequestBody($request),
+                        ],
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ]);
+                    
+                    throw new HttpException(null, $e->getCode(), $e->getMessage(), $e);
+                }
+            };
+        };
+    }
+
+    /**
+     * Get request body content.
+     *
+     * @param RequestInterface $request
+     * @return string
+     */
+    protected function getRequestBody(RequestInterface $request)
+    {
+        $body = $request->getBody();
+        if ($body instanceof StreamInterface) {
+            $content = (string) $body;
+            // Reset body position if possible
+            if ($body->isSeekable()) {
+                $body->rewind();
+            }
+            return $content;
+        }
+        return '';
     }
 
     /**

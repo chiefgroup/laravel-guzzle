@@ -12,5 +12,8 @@ namespace Chiefgroup\Http\Exceptions;
 
 class HttpException extends Exception
 {
-
+    public function __construct($response = null, $code = 0, $message = 'HTTP request failed', \Exception $previous = null)
+    {
+        parent::__construct($response, $code, $message, $previous);
+    }
 }

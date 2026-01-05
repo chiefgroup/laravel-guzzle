@@ -37,14 +37,10 @@ return [
     ],
 
     /**
-     * You may want to log everything.
-     */
-    'debug'   => false,
-
-    /**
      * Log filePath.
      */
     'log'     => [
+        'channel' => null, // Set to your custom log channel
         'file' => 'storage/logs/guzzle_http.log'
     ]
 ];
