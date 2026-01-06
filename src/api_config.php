@@ -41,6 +41,5 @@ return [
      */
     'log'     => [
         'channel' => null, // Set to your custom log channel
-        'file' => 'storage/logs/guzzle_http.log'
     ]
 ];
